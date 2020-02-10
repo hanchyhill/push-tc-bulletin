@@ -1,0 +1,8 @@
+{
+  "name": "push-tc-bulletin",
+  "version": "1.0.0",
+  "description": "push tropical cyclone bulletin to weixin",
+  "main": "index.js",
+  "author": "minhill",
+  "license": "GPL"
+}
