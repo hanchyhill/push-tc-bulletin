@@ -4,5 +4,14 @@
   "description": "push tropical cyclone bulletin to weixin",
   "main": "index.js",
   "author": "minhill",
-  "license": "GPL"
+  "license": "GPL-2.0",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "md5": "^2.2.1",
+    "moment": "^2.24.0",
+    "node-schedule": "^1.3.2",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "sqlite3": "^4.1.1"
+  }
 }
