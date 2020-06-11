@@ -28,3 +28,4 @@ yarn-error.log
 *.db
 *.sqlite3
 package-lock.json
+main.test.js

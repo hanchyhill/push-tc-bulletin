@@ -1,6 +1,6 @@
 const schedule = require('node-schedule');
 const rp = require('request-promise');
-const {serverChanKey} = require('./key.config.js');
+const {serverChanKey} = require('./private.key.config.js');
 let scUrl = `https://sc.ftqq.com/${serverChanKey}.send`;
 
 let demoDes = `[JMA台風情報](http://www.jma.go.jp/en/typh/)

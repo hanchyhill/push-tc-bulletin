@@ -7,15 +7,15 @@ const config = {
   wt:{
     url:'http://tgftp.nws.noaa.gov/data/raw/wt/?C=M;O=D',
     base:'http://tgftp.nws.noaa.gov/data/raw/wt/',
-    // lastDate : Date.now() - 1000*60*60*24*30,
-    lastDate : Date.now() - 1000*60*60*24*60,
+    lastDate : Date.now() - 1000*60*60*24*30,
+    // lastDate : Date.now() - 1000*60*60*24*30*5,
     rules:[
       {reg:/wtpq2.*?rjtd/,name:'WTPQ2-RJTD',},
       // {reg:/wtpq3.*?rjtd/,name:'WTPQ3-RJTD',},
       // {reg:/wtpq5.*?rjtd/,name:'WTPQ5-RJTD',},
       // {reg:/wtjp2.*?rjtd/,name:'WTJP2-RJTD',},//JMA WARNING
       // {reg:/wtjp3.*?rjtd/,name:'WTJP3-RJTD',},//JMA STORM WARNING
-      // {reg:/wtpn2.*?pgtw/,name:'WTPQ2-PGTW',},
+      {reg:/wtpn2.*?pgtw/,name:'WTPQ2-PGTW',},
       {reg:/wtpn3.*?pgtw/,name:'WTPQ3-PGTW',},
       // {reg:/wtpn5.*?pgtw/,name:'WTPQ5-PGTW',},
       // {reg:/wtss.*?vhhh/,name:'WTSS-VHHH',},
@@ -88,7 +88,8 @@ async function getFileList(opt={url:''}){
     date = moment(dateString.trim(), "DD-MMM-YYYY HH:mm")
     fileArr.push({fileName,url,date,});
   });
-
+  
+  // console.log(fileArr);
   const filterArr = fileArr.filter(v=>{// 筛查文件和日期
     let isInclude = false;
     let rules = opt.rules;
@@ -111,6 +112,7 @@ async function getNoaa(){
   try{
     for (let iConfig of configKey){
       const list = await getFileList(config[iConfig]);
+      // console.log(list);
       if(list.length!=0){
         console.log(list.map(v=>v.fileName));
         config[iConfig].lastDate = list[0].date.valueOf();// 记录最后更新时间，其实也可以记录lastModified

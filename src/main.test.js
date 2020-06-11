@@ -4,8 +4,9 @@ const {getTyExpress,getBJbulet} = require('./getData/getBJbulletin.js');
 const MD5 = require('md5');
 const {getNoaa} = require('./getData/getBulletin.js');
 const moment = require('moment');
+const axios = require('axios')
 
-let db = new sqlite.Database('./db/test.db');
+let db = new sqlite.Database('./db/bulletin.private.db');
 const bulletinConfig = [
   { name:'WTPQ2-RJTD', 
     cnName:'日本台风警报',
@@ -162,6 +163,8 @@ function createPushOpt(key='', title='日本台风报文', des='![日本台风�
   return option;
 }
 
+
+
 convertBulletin2Markdown = (bulletin={timeString:'',content:'',cnName:'',url:'', name:'', timestamps:null})=>{
   let cfg = bulletinConfig.find(v=>v.name === bulletin.name);
   if(!cfg) return TypeError('无法识别的报文类型');
@@ -179,6 +182,23 @@ ${bulletin.content.trim()}
   return {title, des};
 }
 
+function createHookOpt( title='日本台风报文', des='![日本台风报文](http://www.jma.go.jp/en/typh/images/wide/all-00.png)'){
+  let scUrl = `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=2eb6e63a-561b-45b3-a32a-ab34a3704a9e`;
+  let option = {
+    method: 'POST',
+    url: scUrl,
+    headers: {'content-type': 'application/json'},
+    data: {
+      "msgtype": "markdown",
+      "markdown": {
+        "content": `${title}
+        
+        ${des}`,
+    }
+    }
+  };
+  return option;
+}
 
 /**
  * 发送到微信主程序
@@ -195,15 +215,20 @@ async function push2weixin(bullet){
       let pushContent = convertBulletin2Markdown(bullet);
       console.log(pushContent);
       let keyArr = await getAllKeys();
-    
-      for(let row of keyArr){
-        const key = row.serverChanKey;
-        let scOpt = createPushOpt(key, pushContent.title, pushContent.des);// 创建RP请求
-        // TODO 限制并发数
-        let res = await rp(scOpt).catch(err=>{throw err});// TODO, 如何发送错误如何回退?
-        console.log('server酱返回值:')
-        console.log(res);
-      }
+      
+      // for(let row of keyArr){
+      //   const key = row.serverChanKey;
+      //   let scOpt = createPushOpt(key, pushContent.title, pushContent.des);// 创建RP请求
+      //   // TODO 限制并发数
+      //   let res = await rp(scOpt).catch(err=>{throw err});// TODO, 如何发送错误如何回退?
+      //   console.log('server酱返回值:')
+      //   console.log(res);
+      // }
+      let weixinHookOpt = createHookOpt(pushContent.title, pushContent.des);// 创建请求
+      axios(weixinHookOpt)
+        .then(function (response) {
+          console.log(response.data);
+        });
     }catch(err){
       throw err;
     }

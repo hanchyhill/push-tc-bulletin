@@ -5,8 +5,10 @@ const MD5 = require('md5');
 const {getNoaa} = require('./getData/getBulletin.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
+const axios = require('axios')
 
-let db = new sqlite.Database('./db/test.db');
+const weixinHookURI = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=903afbf2-d0f8-456c-9f9d-e2693398320c';
+let db = new sqlite.Database('./db/bulletin.private.db');
 const bulletinConfig = [
   { name:'WTPQ2-RJTD', 
     cnName:'日本台风警报',
@@ -16,6 +18,14 @@ const bulletinConfig = [
     timeFormat:'YY年M月D日H时',
   },
   { name:'WTPN3-PGTW', 
+    cnName:'JTWC热带气旋生成警报',
+    ins:'JTWC',
+    url:'http://jtwc.gdmo.gq/jtwc/jtwc.html?tropical',
+    img:'http://jtwc.gdmo.gq/jtwc/products/abpwsair.jpg',
+    timeFormat:'YY年M月D日H时',
+    regTCFA:'TROPICAL CYCLONE FORMATION ALERT',
+  },
+  { name:'WTPN2-PGTW',
     cnName:'JTWC热带气旋生成警报',
     ins:'JTWC',
     url:'http://jtwc.gdmo.gq/jtwc/jtwc.html?tropical',
@@ -128,7 +138,7 @@ async function updateBulletin({name='EXP-BABJ', content='test', timestamps=''}){
         await db.runAsync(updateSql, [newMD5, content, lastModified, timestamps, name]);
         return {error:false, message:'报文更新成功'};
       }else{
-        return {error:true, message:'报文数据重复'};
+        return {error:true, message: name+'报文数据重复'};
       }
     }
   } catch (error) {
@@ -180,6 +190,44 @@ ${bulletin.content.trim()}
   return {title, des};
 }
 
+/**
+ * 
+ * @param {String} title 
+ * @param {String} des 
+ */
+function createHookOpt( title='日本台风报文', des='![日本台风报文](http://www.jma.go.jp/en/typh/images/wide/all-00.png)', hookURI='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ebaf8a3f-e4a5-4dd6-adba-050cc2fadfff'){
+  let scUrl = hookURI;
+  let option = {
+    method: 'POST',
+    url: scUrl,
+    headers: {'content-type': 'application/json'},
+    data: {
+      "msgtype": "markdown",
+      "markdown": {
+        "content": `${title}
+        
+        ${des}`,
+    }
+    }
+  };
+  return option;
+}
+
+convertBulletin2WeixinCompanyMarkdown = (bulletin={timeString:'',content:'',cnName:'',url:'', name:'', timestamps:null})=>{
+  let cfg = bulletinConfig.find(v=>v.name === bulletin.name);
+  if(!cfg) return TypeError('无法识别的报文类型');
+
+    let dateString = moment(bulletin.timestamps).format(cfg.timeFormat);
+    let title = `${cfg.cnName}`;
+    let des = `
+> 此消息生成时间:${moment().format('YYYY-MM-DD HH:mm:ss')}
+> [打开链接查看原文](${cfg.url})
+
+${bulletin.content.trim()}
+
+`;
+  return {title, des};
+}
 
 /**
  * 发送到微信主程序
@@ -190,9 +238,10 @@ async function push2weixin(bullet){
     try{
       let ms = await updateBulletin(bullet);
       console.log(ms.message);
-      if(ms.error){
+      if(ms.error){// 没更新数据则退出
         return;
       }
+      /**server酱部分 */
       let pushContent = convertBulletin2Markdown(bullet);
       console.log(pushContent);
       let keyArr = await getAllKeys();
@@ -201,10 +250,23 @@ async function push2weixin(bullet){
         const key = row.serverChanKey;
         let scOpt = createPushOpt(key, pushContent.title, pushContent.des);// 创建RP请求
         // TODO 限制并发数
-        let res = await rp(scOpt).catch(err=>{throw err});// TODO, 如何发送错误如何回退?
-        console.log('server酱返回值:')
-        console.log(res);
+        rp(scOpt)
+          .then(res=>{
+            console.log('server酱返回值:')
+            console.log(res);
+          })
+          .catch(err=>{throw err});
+        // let res = await rp(scOpt).catch(err=>{throw err});// TODO, 如何发送错误如何回退?
+        
       }
+      /**企业微信部分 */
+      let pushContent2 = convertBulletin2WeixinCompanyMarkdown(bullet);
+      // let weixinHookOpt = createHookOpt(pushContent2.title, pushContent2.des);// 创建测试请求
+      let weixinHookOpt = createHookOpt(pushContent2.title, pushContent2.des, weixinHookURI);// 创建请求
+      axios(weixinHookOpt)
+        .then(function (response) {
+          console.log(response.data);
+        });
     }catch(err){
       throw err;
     }
