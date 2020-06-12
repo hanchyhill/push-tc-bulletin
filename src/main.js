@@ -218,6 +218,7 @@ convertBulletin2WeixinCompanyMarkdown = (bulletin={timeString:'',content:'',cnNa
   if(!cfg) return TypeError('无法识别的报文类型');
 
     let dateString = moment(bulletin.timestamps).format(cfg.timeFormat);
+    
     let title = `${cfg.cnName}`;
     let des = `
 > 此消息生成时间:${moment().format('YYYY-MM-DD HH:mm:ss')}
@@ -226,6 +227,9 @@ convertBulletin2WeixinCompanyMarkdown = (bulletin={timeString:'',content:'',cnNa
 ${bulletin.content.trim()}
 
 `;
+  if(des.length>4000){
+    des = des.slice(0,4000);
+  }
   return {title, des};
 }
 
