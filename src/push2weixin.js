@@ -1,7 +1,7 @@
 const schedule = require('node-schedule');
 const rp = require('request-promise');
 const {serverChanKey} = require('./private.key.config.js');
-let scUrl = `https://sc.ftqq.com/${serverChanKey}.send`;
+let scUrl = `https://sctapi.ftqq.com/${serverChanKey}.send`;
 
 let demoDes = `[JMA台風情報](http://www.jma.go.jp/en/typh/)
 ![日本台风报文](http://www.jma.go.jp/en/typh/images/wide/all-00.png)
@@ -82,7 +82,7 @@ async function push2sc(){
   console.log(res);
 }
 
-function createPushOpt(txt='日本台风报文', des='![日本台风报文](http://www.jma.go.jp/en/typh/images/wide/all-00.png)'){
+function createPushOpt(txt='日本台风报文', des='![日本台风报文](https://www.jma.go.jp/en/typh/images/wide/all-00.png)'){
   let option = {
     method: 'POST',
     uri: scUrl,

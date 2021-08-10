@@ -157,7 +157,7 @@ async function getAllKeys(){
 }
 
 function createPushOpt(key='', title='日本台风报文', des='![日本台风报文](http://www.jma.go.jp/en/typh/images/wide/all-00.png)'){
-  let scUrl = `https://sc.ftqq.com/${key}.send`;
+  let scUrl = `https://sctapi.ftqq.com/${key}.send`;
   let option = {
     method: 'POST',
     uri: scUrl,

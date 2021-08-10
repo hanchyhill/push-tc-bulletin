@@ -3,15 +3,15 @@ const rp = require('request-promise');
 const cheerio = require('cheerio');
 const moment = require('moment');
 const {resolveData} = require('./readData');
-// const url = 'http://tgftp.nws.noaa.gov/data/raw/wt/?C=M;O=D';
-// http://tgftp.nws.noaa.gov/data/raw/ab/?C=M;O=D
-// http://tgftp.nws.noaa.gov/data/raw/tp/?C=M;O=D
-// http://tgftp.nws.noaa.gov/data/raw/wd/?C=M;O=D
+// const url = 'https://tgftp.nws.noaa.gov/data/raw/wt/?C=M;O=D';
+// https://tgftp.nws.noaa.gov/data/raw/ab/?C=M;O=D
+// https://tgftp.nws.noaa.gov/data/raw/tp/?C=M;O=D
+// https://tgftp.nws.noaa.gov/data/raw/wd/?C=M;O=D
 
 const config = {
   wt:{
-    url:'http://tgftp.nws.noaa.gov/data/raw/wt/?C=M;O=D',
-    base:'http://tgftp.nws.noaa.gov/data/raw/wt/',
+    url:'https://tgftp.nws.noaa.gov/data/raw/wt/?C=M;O=D',
+    base:'https://tgftp.nws.noaa.gov/data/raw/wt/',
     lastDate : Date.now() - 1000*60*60*24*30,
     rules:[
       {reg:/wtpq2.*?rjtd/,name:'WTPQ2-RJTD',},
@@ -29,24 +29,24 @@ const config = {
     ],
   },
   ab:{
-    url:'http://tgftp.nws.noaa.gov/data/raw/ab/?C=M;O=D',
-    base:'http://tgftp.nws.noaa.gov/data/raw/ab/',
+    url:'https://tgftp.nws.noaa.gov/data/raw/ab/?C=M;O=D',
+    base:'https://tgftp.nws.noaa.gov/data/raw/ab/',
     lastDate : Date.now() - 1000*60*60*24*30, // 30 days before
     rules:[
       {reg:/abpw.*?pgtw/,name:'ABPW-PGTW',},
     ],
   },
   tp:{
-    url:'http://tgftp.nws.noaa.gov/data/raw/tp/?C=M;O=D',
-    base:'http://tgftp.nws.noaa.gov/data/raw/tp/',
+    url:'https://tgftp.nws.noaa.gov/data/raw/tp/?C=M;O=D',
+    base:'https://tgftp.nws.noaa.gov/data/raw/tp/',
     lastDate : Date.now() - 1000*60*60*24*30,
     rules:[
       {reg:/tppn.*?pgtw/,name:'TPPN-PGTW',},
     ],
   },
   wd:{
-    url:'http://tgftp.nws.noaa.gov/data/raw/wd/?C=M;O=D',
-    base:'http://tgftp.nws.noaa.gov/data/raw/wd/',
+    url:'https://tgftp.nws.noaa.gov/data/raw/wd/?C=M;O=D',
+    base:'https://tgftp.nws.noaa.gov/data/raw/wd/',
     lastDate : Date.now() - 1000*60*60*24*30,
     rules:[
       {reg:/wdpn.*?pgtw/,name:'WDPN-PGTW',},
