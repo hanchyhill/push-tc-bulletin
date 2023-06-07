@@ -10,7 +10,7 @@ const config = {
     lastDate : Date.now() - 1000*60*60*24*30,
     // lastDate : Date.now() - 1000*60*60*24*30*5,
     rules:[
-      {reg:/wtpq2.*?rjtd/,name:'WTPQ2-RJTD',},
+      {reg:/wtpq5.*?rjtd/,name:'WTPQ5-RJTD',},
       // {reg:/wtpq3.*?rjtd/,name:'WTPQ3-RJTD',},
       // {reg:/wtpq5.*?rjtd/,name:'WTPQ5-RJTD',},
       // {reg:/wtjp2.*?rjtd/,name:'WTJP2-RJTD',},//JMA WARNING
